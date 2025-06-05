@@ -1,78 +1,108 @@
 class AFD:
+    """Un autómata que solo puede estar en un estado a la vez"""
+    
     def __init__(self):
+        # Lista de todos los estados
         self.estados = []
+        
+        # Diccionario de transiciones: estado -> símbolo -> estado destino
         self.transiciones = {}
+        
+        # El estado donde empieza el autómata
         self.estado_inicial = ""
+        
+        # Lista de estados finales (de aceptación)
         self.estados_finales = []
+        
+        # Diccionario para convertir estados a letras (A, B, C...)
         self.estados_a_letras = {}
     
-    def agregar_transicion(self, origen, simbolo, destino):
-        # Crear la clave si no existe
-        if origen not in self.transiciones:
-            self.transiciones[origen] = {}
+    def agregar_transicion(self, estado_origen, simbolo, estado_destino):
+        """Agrega una transición: desde un estado, con un símbolo, a otro estado"""
+        
+        # Crear el diccionario para el estado origen si no existe
+        if estado_origen not in self.transiciones:
+            self.transiciones[estado_origen] = {}
         
         # Agregar la transición
-        self.transiciones[origen][simbolo] = destino
+        self.transiciones[estado_origen][simbolo] = estado_destino
     
     def asignar_letras(self):
-        # Asignar letras A, B, C, D... a los estados
-        # El estado inicial siempre debe ser A
+        """Asigna letras A, B, C... a los estados"""
+        
+        # El estado inicial siempre es A
         if self.estado_inicial in self.estados:
             self.estados_a_letras[self.estado_inicial] = 'A'
         
-        letra_actual = 1  # B, C, D...
+        # Asignar B, C, D... a los demás estados
+        letra_numero = 1  # Para B, C, D...
         for estado in self.estados:
             if estado != self.estado_inicial:
-                self.estados_a_letras[estado] = chr(ord('A') + letra_actual)
-                letra_actual += 1
+                letra = chr(ord('A') + letra_numero)  # Convertir número a letra
+                self.estados_a_letras[estado] = letra
+                letra_numero = letra_numero + 1
     
     def mostrar_tabla(self):
+        """Muestra la tabla de transiciones del AFD"""
+        
         print("\n=== TABLA DE TRANSICIONES AFD ===")
         print("Estado\ta\tb")
         print("-" * 20)
         
         # Mostrar estados en orden: primero el inicial (A), luego los demás
-        estados_ordenados = [self.estado_inicial] + [e for e in self.estados if e != self.estado_inicial]
+        estados_en_orden = [self.estado_inicial]
+        for estado in self.estados:
+            if estado != self.estado_inicial:
+                estados_en_orden.append(estado)
         
-        for estado in estados_ordenados:
+        # Mostrar cada estado
+        for estado in estados_en_orden:
             letra = self.estados_a_letras[estado]
-            linea = letra
             
-            # Marcar estados finales con *
+            # Agregar * si es estado final
             if estado in self.estados_finales:
-                linea += "*"
-            linea += "\t"
+                letra = letra + "*"
             
-            # Columna 'a'
+            linea = letra + "\t"
+            
+            # Columna para símbolo 'a'
             if estado in self.transiciones and 'a' in self.transiciones[estado]:
                 destino = self.transiciones[estado]['a']
-                linea += self.estados_a_letras[destino]
+                linea = linea + self.estados_a_letras[destino]
             else:
-                linea += "∅"
-            linea += "\t"
+                linea = linea + "∅"  # Vacío
             
-            # Columna 'b'
+            linea = linea + "\t"
+            
+            # Columna para símbolo 'b'
             if estado in self.transiciones and 'b' in self.transiciones[estado]:
                 destino = self.transiciones[estado]['b']
-                linea += self.estados_a_letras[destino]
+                linea = linea + self.estados_a_letras[destino]
             else:
-                linea += "∅"
+                linea = linea + "∅"  # Vacío
             
             print(linea)
     
     def mostrar_conjuntos(self):
+        """Muestra qué conjunto de estados del AFND representa cada estado del AFD"""
+        
         print("\n=== TABLA DE CONJUNTOS ===")
         print("Estado\t\tConjunto de estados del AFND")
         print("-" * 45)
         
         # Mostrar estados en orden: primero el inicial (A), luego los demás
-        estados_ordenados = [self.estado_inicial] + [e for e in self.estados if e != self.estado_inicial]
+        estados_en_orden = [self.estado_inicial]
+        for estado in self.estados:
+            if estado != self.estado_inicial:
+                estados_en_orden.append(estado)
         
-        for estado in estados_ordenados:
+        # Mostrar cada estado
+        for estado in estados_en_orden:
             letra = self.estados_a_letras[estado]
             
-            # Marcar estados finales con *
+            # Agregar * si es estado final
             if estado in self.estados_finales:
-                letra += "*"
-              # El estado ya viene como string con formato {q0,q1}
+                letra = letra + "*"
+            
+            # El estado ya viene como string con formato {q0,q1}
             print(f"{letra}\t\t{estado}")

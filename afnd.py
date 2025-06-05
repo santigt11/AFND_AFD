@@ -1,96 +1,137 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Clase AFND - Autómata Finito No Determinista con transiciones épsilon
-"""
-
-from collections import defaultdict
-
 class AFND:
-    """Autómata Finito No Determinista con transiciones épsilon"""
+    """Un autómata que puede estar en varios estados al mismo tiempo"""
     
     def __init__(self):
+        # Lista de todos los estados
         self.estados = set()
+        
+        # Lista de símbolos del alfabeto (a, b, etc.)
         self.alfabeto = set()
-        self.transiciones = defaultdict(lambda: defaultdict(set))
+        
+        # Diccionario de transiciones: 
+        # estado -> símbolo -> lista de estados destino
+        self.transiciones = {}
+        
+        # El estado donde empieza el autómata
         self.estado_inicial = None
+        
+        # Los estados donde el autómata acepta la cadena
         self.estados_finales = set()
     
-    def agregar_estado(self, estado):
-        """Agregar un estado al autómata"""
-        self.estados.add(estado)
+    def agregar_estado(self, nombre_estado):
+        """Agrega un nuevo estado al autómata"""
+        self.estados.add(nombre_estado)
     
-    def establecer_inicial(self, estado):
-        """Establecer el estado inicial"""
-        self.estado_inicial = estado
-        self.estados.add(estado)
+    def establecer_inicial(self, nombre_estado):
+        """Define cuál es el estado inicial"""
+        self.estado_inicial = nombre_estado
+        self.estados.add(nombre_estado)
     
-    def agregar_final(self, estado):
-        """Agregar un estado final"""
-        self.estados_finales.add(estado)
-        self.estados.add(estado)
+    def agregar_final(self, nombre_estado):
+        """Marca un estado como final (de aceptación)"""
+        self.estados_finales.add(nombre_estado)
+        self.estados.add(nombre_estado)
     
-    def agregar_transicion(self, origen, simbolo, destino):
-        """Agregar una transición (origen, símbolo) -> destino"""
-        self.transiciones[origen][simbolo].add(destino)
-        self.estados.add(origen)
-        self.estados.add(destino)
+    def agregar_transicion(self, estado_origen, simbolo, estado_destino):
+        """Agrega una transición: desde un estado, con un símbolo, a otro estado"""
+        
+        # Agregar los estados si no existen
+        self.estados.add(estado_origen)
+        self.estados.add(estado_destino)
+        
+        # Agregar el símbolo al alfabeto (excepto épsilon)
         if simbolo != 'ε':
             self.alfabeto.add(simbolo)
-    
-    def epsilon_clausura(self, estados):
-        """Calcular la ε-clausura de un conjunto de estados"""
-        clausura = set(estados)
-        pila = list(estados)
         
-        while pila:
-            estado = pila.pop()
-            for destino in self.transiciones[estado]['ε']:
-                if destino not in clausura:
-                    clausura.add(destino)
-                    pila.append(destino)
+        # Crear la estructura de transiciones si no existe
+        if estado_origen not in self.transiciones:
+            self.transiciones[estado_origen] = {}
         
-        return clausura
+        if simbolo not in self.transiciones[estado_origen]:
+            self.transiciones[estado_origen][simbolo] = set()
+        
+        # Agregar la transición
+        self.transiciones[estado_origen][simbolo].add(estado_destino)
     
-    def mover(self, estados, simbolo):
-        """Función MOVER: estados alcanzables desde 'estados' con 'simbolo'"""
+    def epsilon_clausura(self, lista_estados):
+        """Encuentra todos los estados alcanzables con transiciones épsilon"""
+        
+        # Empezar con los estados dados
+        resultado = set(lista_estados)
+        
+        # Lista de estados por revisar
+        por_revisar = list(lista_estados)
+        
+        # Revisar cada estado
+        while por_revisar:
+            estado_actual = por_revisar.pop()
+            
+            # Si este estado tiene transiciones épsilon
+            if estado_actual in self.transiciones and 'ε' in self.transiciones[estado_actual]:
+                
+                # Revisar cada estado alcanzable con épsilon
+                for nuevo_estado in self.transiciones[estado_actual]['ε']:
+                    
+                    # Si no lo habíamos visitado antes
+                    if nuevo_estado not in resultado:
+                        resultado.add(nuevo_estado)
+                        por_revisar.append(nuevo_estado)
+        
+        return resultado
+    
+    def mover(self, lista_estados, simbolo):
+        """Encuentra estados alcanzables desde la lista con el símbolo dado"""
+        
         resultado = set()
-        for estado in estados:
-            resultado.update(self.transiciones[estado][simbolo])
+        
+        # Para cada estado en la lista
+        for estado in lista_estados:
+            
+            # Si el estado tiene transiciones con este símbolo
+            if estado in self.transiciones and simbolo in self.transiciones[estado]:
+                
+                # Agregar todos los estados destino
+                resultado.update(self.transiciones[estado][simbolo])
+        
         return resultado
     
     def imprimir_tabla_transiciones(self):
-        """Imprimir la tabla de transiciones del AFND en formato matricial"""
+        """Muestra la tabla de transiciones del AFND"""
+        
         print("\n=== TABLA DE TRANSICIONES AFND ===")
         
-        # Crear alfabeto extendido con épsilon
-        alfabeto_extendido = sorted(list(self.alfabeto)) + ['ε']
-        estados_ordenados = sorted(list(self.estados))
+        # Crear lista de símbolos incluyendo épsilon
+        simbolos = sorted(list(self.alfabeto)) + ['ε']
+        estados_lista = sorted(list(self.estados))
         
-        # Encabezado
-        header = "Estado\t" + "\t".join(alfabeto_extendido)
-        print(header)
-        print("-" * (len(header) + 10))
+        # Imprimir encabezado
+        encabezado = "Estado\t" + "\t".join(simbolos)
+        print(encabezado)
+        print("-" * (len(encabezado) + 10))
         
-        # Filas de estados
-        for estado in estados_ordenados:
-            fila = [estado]
+        # Imprimir cada estado
+        for estado in estados_lista:
             
-            for simbolo in alfabeto_extendido:
-                transiciones_estado = self.transiciones[estado][simbolo]
-                if transiciones_estado:
-                    # Convertir set a lista ordenada para consistencia
-                    destinos = sorted(list(transiciones_estado))
+            # Nombre del estado (con * si es final)
+            nombre = estado
+            if estado in self.estados_finales:
+                nombre = f"{estado}*"
+            
+            fila = [nombre]
+            
+            # Para cada símbolo
+            for simbolo in simbolos:
+                
+                # Si hay transiciones con este símbolo
+                if estado in self.transiciones and simbolo in self.transiciones[estado]:
+                    destinos = sorted(list(self.transiciones[estado][simbolo]))
+                    
                     if len(destinos) == 1:
                         fila.append(destinos[0])
                     else:
-                        # Múltiples destinos, mostrar como conjunto
+                        # Múltiples destinos
                         fila.append("{" + ",".join(destinos) + "}")
                 else:
-                    fila.append("∅")
+                    fila.append("∅")  # Vacío
             
-            # Marcar estados finales con asterisco
-            if estado in self.estados_finales:
-                fila[0] = f"{estado}*"
-            
-            print("\t".join(str(x) for x in fila))
+            print("\t".join(fila))
