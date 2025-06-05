@@ -5,7 +5,7 @@ from generador_grafos import crear_ambos_grafos
 def crear_ejemplo_afnd():
     """Crea un AFND de ejemplo para demostrar la conversión"""
     
-    print("Creando AFND de ejemplo...")
+    print("Creando AFND...")
     
     # Crear un nuevo AFND
     afnd = AFND()
@@ -42,14 +42,14 @@ def crear_ejemplo_afnd():
     afnd.agregar_transicion('q6', 'ε', 'q1')    # épsilon desde q6 a q1
     afnd.agregar_transicion('q3', 'ε', 'q6')    # épsilon desde q3 a q6
     
-    print("✓ AFND creado exitosamente")
+    print(" ||AFND creado exitosamente||")
     return afnd
 
 def main():
     """Función principal del programa"""
     
     print("=" * 60)
-    print("    CONVERSIÓN DE AFND A AFD - VERSIÓN SIMPLE")
+    print("    CONVERSIÓN DE AFND A AFD   ")
     print("=" * 60)
     
     # PASO 1: Crear el AFND de ejemplo
@@ -71,8 +71,6 @@ def main():
     print("\n" + "=" * 60)
     print("    ¡CONVERSIÓN COMPLETADA EXITOSAMENTE!")
     print("=" * 60)
-    print("📁 Los grafos están en la carpeta 'd3'")
-    print("🌐 Abre los archivos .html en tu navegador para verlos")
 
 # Este código se ejecuta cuando corres el archivo
 if __name__ == "__main__":

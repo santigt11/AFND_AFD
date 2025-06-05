@@ -55,7 +55,7 @@ def crear_grafo_afnd(afnd):
     # Crear el archivo HTML
     crear_archivo_html("d3/afnd.html", "afnd.js", "AFND - Automata No Determinista")
     
-    print("✓ Grafo del AFND creado: d3/afnd.html")
+    print(" ||Grafo del AFND creado: d3/afnd.html||")
 
 
 def crear_grafo_afd(afd):
@@ -116,7 +116,7 @@ def crear_grafo_afd(afd):
     # Crear el archivo HTML
     crear_archivo_html("d3/afd.html", "afd.js", "AFD - Automata Determinista")
     
-    print("✓ Grafo del AFD creado: d3/afd.html")
+    print(" ||Grafo del AFD creado: d3/afd.html||")
 
 
 def crear_archivo_js(nombre_archivo, nodos, conexiones):
@@ -231,5 +231,4 @@ def crear_ambos_grafos(afnd, afd):
     crear_grafo_afnd(afnd)
     crear_grafo_afd(afd)
     
-    print("\n✓ ¡Grafos creados exitosamente!")
-    print("✓ Abre los archivos .html en tu navegador para ver los grafos")
+    print("\n||Grafos creados exitosamente!||")

@@ -76,5 +76,5 @@ def convertir_afnd_a_afd(afnd):
     # PASO 4: Asignar letras a los estados del AFD
     afd.asignar_letras()
     
-    print("✓ Conversión completada")
+    print(" ||Conversión completada||")
     return afd
